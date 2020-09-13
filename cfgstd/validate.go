@@ -55,6 +55,21 @@ func (val *Validator) Validate(input ConfigInput, errW io.Writer) (valid bool) {
 		prev = e
 	}
 
+	constants := make(map[string]struct{})
+	for _, cg := range val.Standard.Constants {
+		for _, c := range cg.Entries {
+			constants[c.Key] = struct{}{}
+		}
+	}
+	// if a config has constants, it needs to have them all.
+	var configHasConstants bool
+	for _, e := range input {
+		if _, ok := constants[e.Key.Value]; ok {
+			configHasConstants = true
+			break
+		}
+	}
+
 	type standardAny struct {
 		i            int
 		fork         string
@@ -64,16 +79,20 @@ func (val *Validator) Validate(input ConfigInput, errW io.Writer) (valid bool) {
 
 	expected := make(map[string]*standardAny)
 	i := 0
-	for _, cg := range val.Standard.Constants {
-		for _, c := range cg.Entries {
-			expected[c.Key] = &standardAny{i: i, fork: cg.Fork, constant: &c}
-			i += 1
+	if configHasConstants {
+		for _, cg := range val.Standard.Constants {
+			for _, c := range cg.Entries {
+				tmp := c
+				expected[c.Key] = &standardAny{i: i, fork: cg.Fork, constant: &tmp}
+				i += 1
+			}
 		}
 	}
 
 	for _, cg := range val.Standard.Configurables {
 		for _, c := range cg.Entries {
-			expected[c.Key] = &standardAny{i: i, fork: cg.Fork, configurable: &c}
+			tmp := c
+			expected[c.Key] = &standardAny{i: i, fork: cg.Fork, configurable: &tmp}
 			i += 1
 		}
 	}
@@ -90,23 +109,35 @@ func (val *Validator) Validate(input ConfigInput, errW io.Writer) (valid bool) {
 			checkBool(e, true, "config entry not recognized")
 			continue
 		}
-		checkBool(e, sp.i != i, "config entry does not match spec configurable (got %d, expected %d, part of fork %s)", i, sp.i, sp.fork)
+		checkBool(e, sp.i != i, "config entry position does not match spec configurable position (got %d, expected %d, part of fork %s)", i, sp.i, sp.fork)
 
 		var expectedTyp EntryType
 		if sp.constant != nil {
 			expectedTyp = sp.constant.Typ
-		}
-		if sp.configurable != nil {
+		} else if sp.configurable != nil {
 			expectedTyp = sp.configurable.Typ
+		} else {
+			fmt.Println("missing typ")
 		}
 		// data types check
 		checkBool(e, e.Value.Kind != expectedTyp.Kind(), "config value must be %s yaml kind, found kind: %s", fmtKind(expectedTyp.Kind()), fmtKind(e.Value.Kind))
 		checkBool(e, e.Value.Style != expectedTyp.Style(), "config values must be %s yaml style, found style: %s", fmtStyle(expectedTyp.Style()), fmtStyle(e.Value.Style))
-		checkBool(e, e.Value.Tag != "", "config values must not use yaml tags for typing, as their type is known already and parsing is kept simple. Found tag: %s", e.Value.Tag)
+		if expectedTyp.Style()&yaml.TaggedStyle != 0 {
+			checkBool(e, e.Value.Style&yaml.TaggedStyle == 0, "config value must have explicit tag %s, but got none", expectedTyp.Tag())
+			checkBool(e, e.Value.Tag != expectedTyp.Tag(), "config value must match tag %s, got: %s", expectedTyp.Tag(), e.Value.Tag)
+		} else {
+			checkBool(e, e.Value.Style&yaml.TaggedStyle != 0, "config value must not have an explicit tag, but got", e.Value.Tag)
+		}
+		if e.Value.Kind == yaml.ScalarNode {
+			vErr := expectedTyp.CheckFormatting(e.Value.Value)
+			checkBool(e, vErr != nil, "config value has bad formatting: %v", vErr)
+		} else {
+
+		}
 
 		// No advanced yml node features, keep parsing simple in any environment
 		checkBool(e, e.Value.Anchor != "", "config entries should not use the YAML anchor feature, found anchor '%s'", e.Value.Anchor)
-		checkBool(e, e.Value.Alias != nil, "config entries should not use the YAML alias feature, alias to node at line %d, col %d, kind %s", e.Value.Alias.Line, e.Value.Alias.Column, fmtKind(e.Value.Kind))
+		checkBool(e, e.Value.Alias != nil, "config entries should not use the YAML alias feature, alias to node: ", fmtUnknownNode(e.Value.Alias))
 	}
 	return
 }

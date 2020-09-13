@@ -26,7 +26,9 @@ func fmtKind(k yaml.Kind) string {
 // Format YAML styles. Think of it as the representation of the node, does not include integer formatting etc.
 func fmtStyle(s yaml.Style) string {
 	switch s {
-	case yaml.TaggedStyle: // a.k.a. plain style
+	case 0:
+		return "no-style"
+	case yaml.TaggedStyle:
 		return "tagged"
 	case yaml.DoubleQuotedStyle:
 		return "double-quotes"
@@ -41,4 +43,11 @@ func fmtStyle(s yaml.Style) string {
 	default:
 		return fmt.Sprintf("unrecognized! (%d)", int(s))
 	}
+}
+
+func fmtUnknownNode(n *yaml.Node) string {
+	if n == nil {
+		return "nil"
+	}
+	return fmt.Sprintf("%s node on line %d col %d", fmtKind(n.Kind), n.Line, n.Column)
 }

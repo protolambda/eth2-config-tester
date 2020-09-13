@@ -1,24 +1,25 @@
 constants:  # constants have a value that never changes
-  GENESIS_SLOT:
-    type: uint64
-    constant: 0
-  GENESIS_EPOCH:
-    type: uint64
-    constant: 0
-  FAR_FUTURE_EPOCH:
-    type: uint64
-    constant: 1099511627776
-  BASE_REWARDS_PER_EPOCH:
-    type: uint64
-  DEPOSIT_CONTRACT_TREE_DEPTH:
-    type: uint64
-    constant: 32
-  JUSTIFICATION_BITS_LENGTH:
-    type: uint64
-    constant: 4
-  ENDIANNESS:
-    type: string
-    constant: little
+  phase0:
+    GENESIS_SLOT:
+      type: uint64
+      constant: 0
+    GENESIS_EPOCH:
+      type: uint64
+      constant: 0
+    FAR_FUTURE_EPOCH:
+      type: uint64
+      constant: 1099511627776
+    BASE_REWARDS_PER_EPOCH:
+      type: uint64
+    DEPOSIT_CONTRACT_TREE_DEPTH:
+      type: uint64
+      constant: 32
+    JUSTIFICATION_BITS_LENGTH:
+      type: uint64
+      constant: 4
+    ENDIANNESS:
+      type: string
+      constant: little
 configurables:  # config keys are grouped by fork, but must be unique across all forks
   phase0:
     MAX_COMMITTEES_PER_SLOT:                              uint64
@@ -41,13 +42,13 @@ configurables:  # config keys are grouped by fork, but must be unique across all
     SECONDS_PER_ETH1_BLOCK:                               uint64
     DEPOSIT_CHAIN_ID:                                     uint64
     DEPOSIT_NETWORK_ID:                                   uint64
-    DEPOSIT_CONTRACT_ADDRESS:                             uint64
+    DEPOSIT_CONTRACT_ADDRESS:                             eth1_address
     MIN_DEPOSIT_AMOUNT:                                   uint64
     MAX_EFFECTIVE_BALANCE:                                uint64
     EJECTION_BALANCE:                                     uint64
     EFFECTIVE_BALANCE_INCREMENT:                          uint64
-    GENESIS_FORK_VERSION:                                 uint64
-    BLS_WITHDRAWAL_PREFIX:                                uint64
+    GENESIS_FORK_VERSION:                                 bytes4
+    BLS_WITHDRAWAL_PREFIX:                                bytes1
     GENESIS_DELAY:                                        uint64
     SECONDS_PER_SLOT:                                     uint64
     MIN_ATTESTATION_INCLUSION_DELAY:                      uint64
@@ -74,15 +75,15 @@ configurables:  # config keys are grouped by fork, but must be unique across all
     MAX_ATTESTATIONS:                                     uint64
     MAX_DEPOSITS:                                         uint64
     MAX_VOLUNTARY_EXITS:                                  uint64
-    DOMAIN_BEACON_PROPOSER:                               uint64
-    DOMAIN_BEACON_ATTESTER:                               uint64
-    DOMAIN_RANDAO:                                        uint64
-    DOMAIN_DEPOSIT:                                       uint64
-    DOMAIN_VOLUNTARY_EXIT:                                uint64
-    DOMAIN_SELECTION_PROOF:                               uint64
-    DOMAIN_AGGREGATE_AND_PROOF:                           uint64
+    DOMAIN_BEACON_PROPOSER:                               domain
+    DOMAIN_BEACON_ATTESTER:                               domain
+    DOMAIN_RANDAO:                                        domain
+    DOMAIN_DEPOSIT:                                       domain
+    DOMAIN_VOLUNTARY_EXIT:                                domain
+    DOMAIN_SELECTION_PROOF:                               domain
+    DOMAIN_AGGREGATE_AND_PROOF:                           domain
   phase1:
-    PHASE_1_FORK_VERSION:                                 uint64
+    PHASE_1_FORK_VERSION:                                 bytes4
     PHASE_1_FORK_SLOT:                                    uint64
     INITIAL_ACTIVE_SHARDS:                                uint64
     MAX_SHARDS:                                           uint64
@@ -90,7 +91,7 @@ configurables:  # config keys are grouped by fork, but must be unique across all
     GASPRICE_ADJUSTMENT_COEFFICIENT:                      uint64
     MAX_SHARD_BLOCK_SIZE:                                 uint64
     TARGET_SHARD_BLOCK_SIZE:                              uint64
-    SHARD_BLOCK_OFFSETS:                                  uint64
+    SHARD_BLOCK_OFFSETS:                                  offsets
     MAX_SHARD_BLOCKS_PER_ATTESTATION:                     uint64
     BYTES_PER_CUSTODY_CHUNK:                              uint64
     CUSTODY_RESPONSE_DEPTH:                               uint64
@@ -99,18 +100,18 @@ configurables:  # config keys are grouped by fork, but must be unique across all
     ONLINE_PERIOD:                                        uint64
     LIGHT_CLIENT_COMMITTEE_PERIOD:                        uint64
     MAX_CUSTODY_CHUNK_CHALLENGE_RECORDS:                  uint64
-    DOMAIN_SHARD_PROPOSAL:                                uint64
-    DOMAIN_SHARD_COMMITTEE:                               uint64
-    DOMAIN_LIGHT_CLIENT:                                  uint64
-    DOMAIN_CUSTODY_BIT_SLASHING:                          uint64
-    DOMAIN_LIGHT_SELECTION_PROOF:                         uint64
-    DOMAIN_LIGHT_AGGREGATE_AND_PROOF:                     uint64
+    DOMAIN_SHARD_PROPOSAL:                                domain
+    DOMAIN_SHARD_COMMITTEE:                               domain
+    DOMAIN_LIGHT_CLIENT:                                  domain
+    DOMAIN_CUSTODY_BIT_SLASHING:                          domain
+    DOMAIN_LIGHT_SELECTION_PROOF:                         domain
+    DOMAIN_LIGHT_AGGREGATE_AND_PROOF:                     domain
     RANDAO_PENALTY_EPOCHS:                                uint64
     EARLY_DERIVED_SECRET_PENALTY_MAX_FUTURE_EPOCHS:       uint64
     EPOCHS_PER_CUSTODY_PERIOD:                            uint64
     CUSTODY_PERIOD_TO_RANDAO_PADDING:                     uint64
     MAX_CHUNK_CHALLENGE_DELAY:                            uint64
-    CUSTODY_PRIME:                                        uint64
+    CUSTODY_PRIME:                                        bignum
     CUSTODY_SECRETS:                                      uint64
     BYTES_PER_CUSTODY_ATOM:                               uint64
     CUSTODY_PROBABILITY_EXPONENT:                         uint64

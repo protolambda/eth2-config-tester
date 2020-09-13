@@ -1,23 +1,24 @@
-# Minimal preset
+# Mainnet preset
+# Note: the intention of this file (for now) is to illustrate what a mainnet configuration could look like.
+# Some of these constants may still change before the launch of Phase 0.
 
 
 # Misc
 # ---------------------------------------------------------------
-
-# [customized] Just 4 committees for slot for testing purposes
-MAX_COMMITTEES_PER_SLOT: 4
-# [customized] unsecure, but fast
-TARGET_COMMITTEE_SIZE: 4
+# 2**6 (= 64)
+MAX_COMMITTEES_PER_SLOT: 64
+# 2**7 (= 128)
+TARGET_COMMITTEE_SIZE: 128
 # 2**11 (= 2,048)
 MAX_VALIDATORS_PER_COMMITTEE: 2048
 # 2**2 (= 4)
 MIN_PER_EPOCH_CHURN_LIMIT: 4
 # 2**16 (= 65,536)
 CHURN_LIMIT_QUOTIENT: 65536
-# [customized] Faster, but unsecure.
-SHUFFLE_ROUND_COUNT: 10
-# [customized]
-MIN_GENESIS_ACTIVE_VALIDATOR_COUNT: 64
+# See issue 563
+SHUFFLE_ROUND_COUNT: 90
+# `2**14` (= 16,384)
+MIN_GENESIS_ACTIVE_VALIDATOR_COUNT: 16384
 # Jan 3, 2020
 MIN_GENESIS_TIME: 1578009600
 # 4
@@ -32,14 +33,14 @@ PROPORTIONAL_SLASHING_MULTIPLIER: 3
 
 # Fork Choice
 # ---------------------------------------------------------------
-# 2**1 (= 1)
-SAFE_SLOTS_TO_UPDATE_JUSTIFIED: 2
+# 2**3 (= 8)
+SAFE_SLOTS_TO_UPDATE_JUSTIFIED: 8
 
 
 # Validator
 # ---------------------------------------------------------------
-# [customized] process deposits more quickly, but insecure
-ETH1_FOLLOW_DISTANCE: 16
+# 2**10 (= 1,024)
+ETH1_FOLLOW_DISTANCE: 1024
 # 2**4 (= 16)
 TARGET_AGGREGATORS_PER_COMMITTEE: 16
 # 2**0 (= 1)
@@ -52,9 +53,9 @@ SECONDS_PER_ETH1_BLOCK: 14
 
 # Deposit contract
 # ---------------------------------------------------------------
-# Ethereum Goerli testnet
-DEPOSIT_CHAIN_ID: 5
-DEPOSIT_NETWORK_ID: 5
+# Ethereum PoW Mainnet
+DEPOSIT_CHAIN_ID: 1
+DEPOSIT_NETWORK_ID: 1
 # **TBD**
 DEPOSIT_CONTRACT_ADDRESS: 0x1234567890123456789012345678901234567890
 
@@ -73,46 +74,46 @@ EFFECTIVE_BALANCE_INCREMENT: 1000000000
 
 # Initial values
 # ---------------------------------------------------------------
-# Highest byte set to 0x01 to avoid collisions with mainnet versioning
-GENESIS_FORK_VERSION: 0x00000001
+# Mainnet initial fork version, recommend altering for testnets
+GENESIS_FORK_VERSION: 0x00000000
 BLS_WITHDRAWAL_PREFIX: 0x00
 
 
 # Time parameters
 # ---------------------------------------------------------------
-# [customized] Faster to spin up testnets, but does not give validator reasonable warning time for genesis
-GENESIS_DELAY: 300
-# [customized] Faster for testing purposes
-SECONDS_PER_SLOT: 6
-# 2**0 (= 1) slots 6 seconds
+# 172800 seconds (2 days)
+GENESIS_DELAY: 172800
+# 12 seconds
+SECONDS_PER_SLOT: 12
+# 2**0 (= 1) slots 12 seconds
 MIN_ATTESTATION_INCLUSION_DELAY: 1
-# [customized] fast epochs
-SLOTS_PER_EPOCH: 8
-# 2**0 (= 1) epochs
+# 2**5 (= 32) slots 6.4 minutes
+SLOTS_PER_EPOCH: 32
+# 2**0 (= 1) epochs 6.4 minutes
 MIN_SEED_LOOKAHEAD: 1
-# 2**2 (= 4) epochs
+# 2**2 (= 4) epochs 25.6 minutes
 MAX_SEED_LOOKAHEAD: 4
-# [customized] higher frequency new deposits from eth1 for testing
-EPOCHS_PER_ETH1_VOTING_PERIOD: 4
-# [customized] smaller state
-SLOTS_PER_HISTORICAL_ROOT: 64
-# 2**8 (= 256) epochs
+# 2**5 (= 32) epochs ~3.4 hours
+EPOCHS_PER_ETH1_VOTING_PERIOD: 32
+# 2**13 (= 8,192) slots ~13 hours
+SLOTS_PER_HISTORICAL_ROOT: 8192
+# 2**8 (= 256) epochs ~27 hours
 MIN_VALIDATOR_WITHDRAWABILITY_DELAY: 256
-# [customized] higher frequency of committee turnover and faster time to acceptable voluntary exit
-SHARD_COMMITTEE_PERIOD: 64
-# [customized] fast catchup crosslinks
-MAX_EPOCHS_PER_CROSSLINK: 4
-# 2**2 (= 4) epochs
+# 2**8 (= 256) epochs ~27 hours
+SHARD_COMMITTEE_PERIOD: 256
+# 2**6 (= 64) epochs ~7 hours
+MAX_EPOCHS_PER_CROSSLINK: 64
+# 2**2 (= 4) epochs 25.6 minutes
 MIN_EPOCHS_TO_INACTIVITY_PENALTY: 4
 
 
 # State vector lengths
 # ---------------------------------------------------------------
-# [customized] smaller state
-EPOCHS_PER_HISTORICAL_VECTOR: 64
-# [customized] smaller state
-EPOCHS_PER_SLASHINGS_VECTOR: 64
-# 2**24 (= 16,777,216) historical roots
+# 2**16 (= 65,536) epochs ~0.8 years
+EPOCHS_PER_HISTORICAL_VECTOR: 65536
+# 2**13 (= 8,192) epochs ~36 days
+EPOCHS_PER_SLASHINGS_VECTOR: 8192
+# 2**24 (= 16,777,216) historical roots, ~26,131 years
 HISTORICAL_ROOTS_LIMIT: 16777216
 # 2**40 (= 1,099,511,627,776) validator spots
 VALIDATOR_REGISTRY_LIMIT: 1099511627776
@@ -157,28 +158,25 @@ DOMAIN_SELECTION_PROOF: 0x05000000
 DOMAIN_AGGREGATE_AND_PROOF: 0x06000000
 
 
-
-# Minimal preset - phase 1
+# Mainnet preset - phase 1
 
 
 # phase1-fork
 # ---------------------------------------------------------------
-# [customized] for testnet distinction
-PHASE_1_FORK_VERSION: 0x01000001
+PHASE_1_FORK_VERSION: 0x01000000
 # [STUB]
 PHASE_1_FORK_SLOT: 0
-# [customized] reduced for testing
-INITIAL_ACTIVE_SHARDS: 2
+INITIAL_ACTIVE_SHARDS: 64
 
 
 # beacon-chain
 # ---------------------------------------------------------------
 # Misc
-# [customized] reduced for testing
-MAX_SHARDS: 8
+# 2**10 (= 1,024)
+MAX_SHARDS: 1024
 # 2**7 (= 128)
 LIGHT_CLIENT_COMMITTEE_SIZE: 128
-#  2**3 (= 8)
+# 2**3 (= 8)
 GASPRICE_ADJUSTMENT_COEFFICIENT: 8
 
 # Shard block configs
@@ -223,17 +221,16 @@ DOMAIN_LIGHT_AGGREGATE_AND_PROOF: 0x85000000
 # custody-game
 # ---------------------------------------------------------------
 # Time parameters
-# 2**1 (= 2) epochs
+# 2**1 (= 2) epochs, 12.8 minutes
 RANDAO_PENALTY_EPOCHS: 2
-# [customized] quicker for testing
-EARLY_DERIVED_SECRET_PENALTY_MAX_FUTURE_EPOCHS: 64
-# [customized] quicker for testing
-EPOCHS_PER_CUSTODY_PERIOD: 32
-# [customized] quicker for testing
-CUSTODY_PERIOD_TO_RANDAO_PADDING: 8
-# [customize for faster testing]
-MAX_CHUNK_CHALLENGE_DELAY: 64
-
+# 2**15 (= 32,768) epochs, ~146 days
+EARLY_DERIVED_SECRET_PENALTY_MAX_FUTURE_EPOCHS: 32768
+# 2**14 (= 16,384) epochs ~73 days
+EPOCHS_PER_CUSTODY_PERIOD: 16384
+# 2**11 (= 2,048) epochs, ~9 days
+CUSTODY_PERIOD_TO_RANDAO_PADDING: 2048
+# 2**15 (= 32,768) epochs, ~146 days
+MAX_CHUNK_CHALLENGE_DELAY: 32768
 
 # Misc parameters
 # 2**256 - 189
@@ -242,19 +239,18 @@ CUSTODY_PRIME: 11579208923731619542357098500868790785326998466564056403945758400
 CUSTODY_SECRETS: 3
 # 2**5 (= 32) bytes
 BYTES_PER_CUSTODY_ATOM: 32
-# 1/4 chance of custody bit 1 [customized for faster testing]
-CUSTODY_PROBABILITY_EXPONENT: 2
-
+# 1/1024 chance of custody bit 1
+CUSTODY_PROBABILITY_EXPONENT: 10
 
 # Max operations
 # 2**8 (= 256)
 MAX_CUSTODY_KEY_REVEALS: 256
 # 2**0 (= 1)
 MAX_EARLY_DERIVED_SECRET_REVEALS: 1
-# [customized]
-MAX_CUSTODY_CHUNK_CHALLENGES: 2
-# [customized]
-MAX_CUSTODY_CHUNK_CHALLENGE_RESP: 8
+# 2**2 (= 2)
+MAX_CUSTODY_CHUNK_CHALLENGES: 4
+# 2** 4 (= 16)
+MAX_CUSTODY_CHUNK_CHALLENGE_RESP: 16
 # 2**0 (= 1)
 MAX_CUSTODY_SLASHINGS: 1
 
