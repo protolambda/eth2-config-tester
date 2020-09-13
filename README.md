@@ -11,6 +11,17 @@ The goals is to make configs:
 - Bare, no inline comments, head/foot comments are ok.
 - Standard, following a spec for the config
 
+## Usage
+
+```shell script
+# install
+go get github.com/protolambda/eth2-config-tester
+
+# feed config file into tester
+cat my_eth2_config.yml | eth2-config-tester --config-spec=config_spec.yaml
+```
+
+
 ## License
 
 CC0 1.0 Universal, see [LICENSE](./LICENSE) file.
