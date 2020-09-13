@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"io"
-	"os"
 	"strings"
 )
 
 type Validator struct {
-	Standard *CfgStandard
+	Standard      *CfgStandard
+	ExpectedForks []string
 }
 
 type ConfigInputEntry struct {
@@ -38,9 +38,11 @@ func (val *Validator) Validate(input ConfigInput, errW io.Writer) (valid bool) {
 	valid = true
 	checkBool := func(e *ConfigInputEntry, b bool, msg string, data ...interface{}) bool {
 		if b {
-			_, _ = fmt.Fprintf(os.Stderr, "(key: '%s', line: %d): ", e.Key.Value, e.Key.Line)
-			_, _ = fmt.Fprintf(os.Stderr, msg, data...)
-			_, _ = fmt.Fprintf(os.Stderr, "\n")
+			if e != nil {
+				_, _ = fmt.Fprintf(errW, "(key: '%s', line: %d): ", e.Key.Value, e.Key.Line)
+			}
+			_, _ = fmt.Fprintf(errW, msg, data...)
+			_, _ = fmt.Fprintf(errW, "\n")
 			valid = false
 			return true
 		}
@@ -97,6 +99,29 @@ func (val *Validator) Validate(input ConfigInput, errW io.Writer) (valid bool) {
 		}
 	}
 
+	forks := make(map[string]struct{})
+	for _, f := range val.ExpectedForks {
+		forks[f] = struct{}{}
+	}
+	seenInputs := make(map[string]*ConfigInputEntry)
+	for _, e := range input {
+		seenInputs[e.Key.Value] = e
+	}
+	for k, exp := range expected {
+		if e, okInput := seenInputs[k]; okInput {
+			_, okFork := forks[exp.fork]
+			checkBool(e, !okFork, "found input for data of known but ignored fork: %s", exp.fork)
+		} else {
+			if _, okFork := forks[exp.fork]; okFork {
+				if exp.configurable != nil {
+					checkBool(nil, true, "missing expected configurable: %s (fork: %s)", k, exp.fork)
+				} else if configHasConstants {
+					checkBool(nil, true, "missing expected constant: %s (fork: %s)", k, exp.fork)
+				}
+			}
+		}
+	}
+
 	for i, e := range input {
 		// everything should be uppercase
 		checkBool(e, e.Key.Value != strings.ToUpper(e.Key.Value), "name is not uppercase")
@@ -132,12 +157,20 @@ func (val *Validator) Validate(input ConfigInput, errW io.Writer) (valid bool) {
 			vErr := expectedTyp.CheckFormatting(e.Value.Value)
 			checkBool(e, vErr != nil, "config value has bad formatting: %v", vErr)
 		} else {
-
+			vErr := expectedTyp.CheckContents(e.Value.Content)
+			checkBool(e, vErr != nil, "config value has bad contents: %v", vErr)
 		}
 
 		// No advanced yml node features, keep parsing simple in any environment
 		checkBool(e, e.Value.Anchor != "", "config entries should not use the YAML anchor feature, found anchor '%s'", e.Value.Anchor)
 		checkBool(e, e.Value.Alias != nil, "config entries should not use the YAML alias feature, alias to node: ", fmtUnknownNode(e.Value.Alias))
+
+		// Check constant values
+		if sp.constant != nil {
+			// constant values should just match prescribed values,
+			// and can either be omitted as a whole, or all added for completeness
+			checkBool(e, e.Value.Value != sp.constant.Value, "value is different from constant, this is not a configurable, expected: %v", sp.constant.Value)
+		}
 	}
 	return
 }

@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"os"
+	"strings"
 )
 
 func main() {
 	cfgStdPath := flag.String("config-spec", "config_spec.yaml", "configuration standard file to validate configs with")
+	forks := flag.String("forks", "phase0", "forks to expect, comma separated")
 	flag.Parse()
 
 	cfgStd, err := cfgstd.LoadStandard(*cfgStdPath)
@@ -24,7 +26,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	validator := cfgstd.Validator{Standard: cfgStd}
+	if *forks == "" {
+		_, _ = fmt.Fprintf(os.Stderr, "specify at least one fork to expect config values for")
+		os.Exit(1)
+	}
+	expectedForks := strings.Split(*forks, ",")
+	validator := cfgstd.Validator{Standard: cfgStd, ExpectedForks: expectedForks}
 	if validator.Validate(cfg, os.Stderr) {
 		_, _ = fmt.Fprintf(os.Stderr, "config is valid! (config spec: %s)\n", *cfgStdPath)
 		os.Exit(0)

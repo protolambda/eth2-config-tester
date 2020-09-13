@@ -19,6 +19,12 @@ go get github.com/protolambda/eth2-config-tester
 
 # feed config file into tester
 cat my_eth2_config.yml | eth2-config-tester --config-spec=config_spec.yaml
+
+# Test
+cat spec_configs/minimal_phase0.yaml | go run . --forks=phase0
+cat spec_configs/minimal_phase1.yaml | go run . --forks=phase0,phase1
+cat spec_configs/mainnet_phase0.yaml | go run . --forks=phase0
+cat spec_configs/mainnet_phase1.yaml | go run . --forks=phase0,phase1
 ```
 
 ## Planned
