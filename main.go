@@ -1,9 +1,9 @@
 package main
 
 import (
-	"eth2-config-tester/cfgstd"
 	"flag"
 	"fmt"
+	"github.com/protolambda/eth2-config-tester/cfgstd"
 	"gopkg.in/yaml.v3"
 	"os"
 	"strings"

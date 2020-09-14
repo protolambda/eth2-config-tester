@@ -1,4 +1,4 @@
-module eth2-config-tester
+module github.com/protolambda/eth2-config-tester
 
 go 1.14
 
